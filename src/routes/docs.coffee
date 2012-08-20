@@ -1,4 +1,7 @@
-otl        = require("outline-markdown")
+#otl        = require("outline-markdown")
+path       = require 'path'
+omd        = new (require "outline-markdown").Omd 
+#omd             = new (require '../omd').Omd 
 
 module.exports = (app) ->
   app.get '/docs/*', (req, res, next) ->
@@ -7,21 +10,22 @@ module.exports = (app) ->
       next()
     else
       # console.log params
-      doc = {}
-      doc['params'] = params
-      paramParts = params[0].split("/")
-      doc['paramParts'] = paramParts
+      # doc = {}
+      # doc['params'] = params
+      srcFileParts = params[0].split("/")
+      srcName      = path.join(app.get("docsSrcPath"), srcFileParts.join(path.sep) + '.omd')
+      #console.log 'srcFileParts', srcFileParts
+      srcFileParts.pop()
+      srcPath      = srcFileParts.join(path.sep)
+      dstPath      = path.join(app.get("docsDstPath"), srcPath)
 
-      doc['rootdir'] = app.get "docsSrcPath"
-      doc['docsDstPath'] = app.get "docsDstPath"
-      doc['srcName'] = paramParts.pop()
-      doc['srcName'] += '.ol'
-      doc['path'] = paramParts.join('/')
-      doc['subdir'] = paramParts.join('/')
-      doc['dstPath'] = doc['docsDstPath']
-      console.log doc
-      otl.parseOl doc['rootdir'], doc['subdir'], doc['srcName'], doc['dstPath'], (err, callback) ->
-        console.log 'run it'
+      # console.log 'srcName', srcName
+      # console.log 'srcPath', srcPath
+      # console.log 'dstPath', dstPath
+      #console.log 'render', "docs/" + params[0]
+      #res.render "docs/" + params[0]
+      omd.parse srcName, dstPath, (callback) ->
+        console.log 'render', "docs/" + params[0]
         res.render "docs/" + params[0]
 
       res.end()
