@@ -2,7 +2,7 @@ path       = require("path")
 express    = require("express")
 routes     = require("./routes")
 http       = require("http")
-# otl        = require("outline-markdown")
+omd        = new (require "outline-markdown").Omd 
 
 app = express()
 
@@ -47,7 +47,8 @@ app.configure ->
   app.use express["static"](path.join(__dirname, "public"))
   app.use express["static"](path.join(__dirname, "docs"))
 
-# otl.parse('./docs', path.join(app.get("views"),'docs'))
+omd.buildIndex 'docs', app.set("docsSrcPath"), app.set("docsDstPath"), (callback) ->
+  console.log 'buildIndex'
 
 ['index', 'docs'].forEach (controller)->
   require('./routes/'+controller)(app)
